@@ -33,6 +33,8 @@
 
 作者首先验证了情感分类和主题分类的不同，并且验证了机器学习算法应用于情感分类是可行的，得到的分类结果会好于人直觉想出的分类标准。在测试的结果中，Naive Bayes表现最差，SVM表现最好，但差别并不显著。
 
+因为是几乎首创性质的领域，baseline是使用的直觉的分类策略设定的。
+
 除此以外，在实验过程中得到了两个和主题分类相比显著的不同：
 
 1. 已经验证了的相同的传统机器学习算法在topic categorization和sentiment classification上面的表现差异是明显的，情感分类的准确度均大大低于主题分类的结果
@@ -50,9 +52,15 @@
 
 作者使用术语*sematic orientation*（我直译为*语义指向*）用来对phrases的情感倾向进行计算，计算原则如下：
 
+* given phrase <=> mutual info <=> excellent
+* given phrase <=> mutual info <=> poor
+* up minus down
+
 > ..., the semantic orientation of a phrase is calculated as the mutual information between the given phrase and the word “excellent” minus the mutual information between the given phrase and the word “poor”. A review is classified as recommended if the average semantic orientation of its phrases is positive.
 
 目前读到的这两位，基本算是情感计算的开创者，此前虽然也有相关的应用(Tong, 2001)，但Tong本人也没能足够重视情感计算这个领域本身，只是把情感计算作为一种工具。Tong这个有意思的工作应该流传的是相当广泛的，课上秦老师还提到过她们也做过类似的东西。
+
+sentiment timelines，根据网络上的评论情感分布，得出不同时间段人们的情感变化曲线
 
 >As far as I know, the only prior published work on the task of classifying reviews as thumbs up or down is Tong’s (2001) **system for generating sentiment timelines**. This system tracks online discussions about movies and displays a plot of the number of positive sentiment and negative sentiment messages over time. Messages are classified
 >by looking for specific phrases that indicate the sentiment of the author towards the movie (e.g., “great acting”, “wonderful visuals”, “terrible score”, “uneven editing”). Each phrase must be manually added to a special lexicon and manually tagged as indicating positive or negative sentiment.
@@ -90,7 +98,7 @@
 
 这篇论文是在解决指定描述对象的情感分类问题，主要是使用target-dependent LSTM，以及后续提出的target-connection LSTM，这两种的分类准确度都远高于标准LSTM。老师们在使用LSTM的时候，是使用的两个LSTM作为整合上下文信息的方式。
 
-> 我暂时没有理解为什么不直接使用bidirectional LSTM，或者对比二者结果。我推测可能的原因是，本文的主要核心是在处理target-dependent的问题，模型的选择时次要的（但我觉得这个说法不够充分，关键是使用双向RNN来处理上下文信息是很容易想到的），也可能只是相同的实现思想，只是老师她们没有专门说。这里就是我不熟悉模型底层实现导致的空想问题了。
+> 我暂时没有理解为什么不直接使用bidirectional LSTM，或者对比二者结果。我推测可能的原因是，本文的主要核心是在处理target-dependent的问题，模型的选择时次要的（但我觉得这个说法不够充分，关键是使用双向RNN来处理上下文信息是很容易想到的），也可能只是相同的实现思想，只是老师她们没有专门说。
 
 有个问题是，文中地址和[Duyu Tang](http://ir.hit.edu.cn/~dytang)老师相关的链接已经失效了，重定向到[微软](https://www.microsoft.com/en-us/research/people/dutang/)的也失效了，至少给我提醒的一点是，最好有个自己的博客作为专门的展示渠道，或者使用非学校的第三方如共用的GitHub账号之类的。Word embedding这里，Stanford那边的链接还是有效的，他们的word embedding数据量更大些，结果自然会更好。但我有个想法是，没必要特别区分词嵌入预训练模型的数据来源，根本目的是让语义相关的词语具有较高的相似度，好吧，写着写着知道我自己在瞎扯，数据来源不同的话结果自然是存在着差异的，不同文本环境下，同一个词语的常用含义是会发生改变的，我们人不需要作区分大概只是阅读量够了，但模型训练量想要足够又变成数据量太大的问题了。
 
@@ -114,11 +122,11 @@
 
 > Majority of existing studies build sentiment classifiers with supervised machine learning approach, such as feature based Supported Vector Machine (Jiang et al., 2011) or neural network approaches (Dong et al., 2014; Vo and Zhang, 2015). Despite the effectiveness of these approaches, we argue that target-dependent sentiment classification remains a challenge: how to effectively model the semantic relatedness of a target word with its context words in a sentence.
 
-提及直接将target-dependent features整合到特征里面来使用SVM比较麻烦，那这里应该是实现了一种免于人工标注的方法。很有可能，这篇论文也是相当的早期的结果。但我现在必须要搞清楚，这篇论文中使用的两个LSTM和Bi-LSTM的区别。以及，我并不清楚的是，我所学习到的东西是哪段时间的内容，所以我不能以后来者的角度来看问题。
+提及直接将target-dependent features整合到特征里面来使用SVM比较麻烦，那这里应该是实现了一种免于人工标注的方法。很有可能，这篇论文也是相当的早期的结果。
 
 >The model could be trained in an end-to-end way with standard backpropagation, where the loss function is cross-entropy error of supervised sentiment classification.
 
-> 我对我们国家的学术界有偏见，所以会不自觉的往这个方向去想。如果我想要证明，他们是为了增加自引用或者模仿他人的工作，我需要假设他们没有模仿他人的已有成果，并且去证明这个结论是错误的可能性很大，这需要我去阅读论文搞清楚时间线问题。
+> Todo: 这需要我去阅读论文搞清楚时间线问题。
 >
 > 现在先把这篇论文分析清楚。
 
@@ -139,20 +147,17 @@ perform well on this target-dependent task. Integrating target information into 
 improve the classification accuracy.
 ```
 
-另一个明显的问题是，超链接失效，主要是url，说明对于维护的重视程度不够，前面已经提到过。
+另一个明显的问题是，超链接失效，主要是url，很可能是对于维护的重视程度不够，前面已经提到过。
 
 这篇文章主要是在对三个模型进行对比
 
->Afterwards, we extend LSTM by
->considering the target word, obtaining the Target-Dependent Long Short-Term Memory (TD-LSTM)
->model. Finally, we extend TD-LSTM with target connection, where the semantic relatedness of target
->with its context words are incorporated.
+>Afterwards, we extend LSTM by considering the target word, obtaining the Target-Dependent Long Short-Term Memory (TD-LSTM) model. Finally, we extend TD-LSTM with target connection, where the semantic relatedness of target with its context words are incorporated.
 
 先简要介绍了RNN的功能，并解释原始RNN存在的问题，然后讲LSTM解决了梯度消失的问题，从而被更广泛的采用。然后老师们用原始LSTM来处理target-dependent的情感分类问题，但这样得到的结果是target-independent的，不符合目标。于是老师们改进出了TD-LSTM和TC-LSTM，都是很小的改动，但我其实很想知道这要怎么改代码，pytorch给的LSTM的结构应该是不能让两个LSTM共用同一个softmax的吧，怕不是要手写代码，当然，用bi-lstm就没有这个问题（但现在我还不清楚那个时候双向的lstm有没有被提出来）。
 
-> 问题就是，现在看不到代码了，原来的链接已经失效了
+> 有个问题就是，现在看不到代码了，原来的链接已经失效了
 
-将目标字符串作为最后预测的结果是合理的，这样从直觉上讲是更加充分的利用了信息的。
+将目标字符串作为最后预测的结果是合理的，这样从直觉上讲是更加充分的利用了信息的。神经网络方法给我的感觉就是，非常具有启发式的特点，能不能被验证取决于最后的实验结果，稍微和传统机器学习的方法有些不同。
 
 > We favor this strategy as we believe that regarding target string as the last unit could better utilize the semantics of target string when using the composed representation for sentiment classification
 
@@ -165,30 +170,54 @@ TD-LSTM基本可以看做就是稍稍改动的Bi-LSTM（或者就是，我现在
 >nection component, which explicitly utilizes the connections between target word and each context word
 >when composing the representation of a sentence.
 
-> An overview of TC-LSTM is illustrated in Figure 2. The input of TC-LSTM is a sentence consist-
-> ing of n words {w1, w2, ...wn} and a target string t occurs in the sentence. We represent target t as
-> {wl+1, wl+2...wr−1} because a target could be a word sequence of variable length, such as “google” or
-> “harry potter”. When processing a sentence, we split it into three components: target words, preceding
-> context words and following context words. We obtain target vector vtarget by averaging the vectors
-> of words it contains, which has been proven to be simple and effective in representing named entities
-> (Socher et al., 2013a; Sun et al., 2015). When compute the hidden vectors of preceding and following
-> context words, we use two separate long short-term memory models, which are similar with the strategy
-> used in TD-LSTM. The difference is that in TC-LSTM the input at each position is the concatenation of
-> word embedding and target vector vtarget, while in TD-LSTM the input at each position only includes
-> the embedding of current word. We believe that TC-LSTM could make better use of the connection
-> between target and each context word when building the representation of a sentence.
+说实话，我不是很理解为什么老师们吧target-independent作为自己论文的核心，我感觉，TC-LSTM才是这篇论文最精巧的地方，也是这篇论文的亮点。但这篇文章却重心是在讲TD-LSTM，也可能是在时间上，这是类似Bi-LSTM首先提出的论文之一，这一点还有待考证。
 
-说实话，我不是很理解为什么老师们吧target-independent作为自己论文的核心，我感觉，TC-LSTM才是这篇论文最精巧的地方，也才是这篇论文的亮点。但这篇文章却重心是在讲TD-LSTM，也可能是在时间上，这是类似Bi-LSTM首先提出的论文之一，这一点还有待考证。
+>When processing a sentence, we split it into three components: target words, preceding
+>context words and following context words. We obtain target vector vtarget by averaging the vectors
+>of words it contains, which has been proven to be simple and effective in representing named entities
+>(Socher et al., 2013a; Sun et al., 2015). 
 
-前面铺垫的太多了（），要不是读到TC-LSTM我都要读不下去了（）。
+读到这里，TC-LSTM的这种做法，其实是过去已经有人提出过的，只是被拿来应用到这个场景中，在除了这种averaging word vectors的做法之外，TC-LSTM就只是在TD-LSTM的基础上修改了输入的维度。具体更详细的averaging word vectors细节可能还要看Socher的论文。
+
+在本文后面提及，做target-dependent的研究并且想到使用word embedding concatenated with feature representations的人并不少。除了本处使用的LSTM，之前已经有SVM使用这一方法来实现target-dependent的情感分类。这里提及了一些研究工作，是使用adaptive recurrent neural network的，从文中简要的解释中，我推测是将激活函数换为使用类似于maxout network那种自学习的函数，这一点需要在读过论文之后才能明确
+
+> Todo: (Dong et al., 2014)。
+
+从表格的数据和老师们的解释可以看到，SVM事实上已经是相当好的模型了，后面使用的各种RNN未必能有好过传统模型的表现。
+
+如果想要复现模型的话，数据源和模型参数，以及训练过程如下（因为源代码无法查阅，目前只能推测）：
+
+* **network:** LSTM * 2 + softmax，现在感觉可以用Bi-LSTM代替原来的做法，只是需要把最后一层出来的隐层张量稍微处理一下，但文章中没有说清楚最后一层是直接拼接还是加在一起或者是其他的什么操作
+* **parameter:** randomize the parameters with uniform distribution U(−0.003, 0.003)，这里没有给清楚随机数种子，也没有说明是哪个框架，手写代码应该也需要说numpy的随机数种子或者什么之类的，或者确实不是很重要
+* **optimizer:** SGD，这里老师们似乎并没有特别进行选择，直接使用的随机梯度下降（这个时候adam还没有被提出来或者才提出来，但RMSProp之类的应该已经被广泛使用了）
+* **learning rate:** 0.01
+* **pre-trained:** 100-dimensional Glove vector from twtter
+
+论文没有什么新的公式，只是在使用过去已经有的研究成果。主要证明的观点是，在不使用lexicon information的情况下，只是用target-dependent的双向LSTM已经能起到比较好的结果。对于未来结合使用lexicon information我也认为会有比较好的结果。现在还缺乏相关论文的阅读。
+
+接下来是在讲Word embedding的事情，但是SSWE已经无法查看了，后面复现只能看看Glove的预训练词向量。
+
+这里解释了为什么主要是在讲TD-LSTM，因为训练成本相对较低而得到的收益很高，非常显著的说明了添加target-dependent信息对于模型学习的影响。我觉得这里主要是得出了双向LSTM在情感分析领域有更好的表现的这个结论。
+
+先讲统计结果，然后把一些有意思的现象专门提出来分析，这一点在前面的论文中也有这比较明显的表现。文中提及，LSTM容易忽略具体target的信息，而使用整个句子的情感指向作为每一个输入的target的情感指向。TD-LSTM和TC-LSTM都能比较好的表现，能一定程度上学习到前后文的信息，但前面可以看出，训练TC-LSTM的时间成本要比TD-LSTM高多了（3-4.25倍，200维度是4.25倍，100维是3倍）。
+
+>We analyse the error cases that both TD-LSTM and TC-LSTM cannot well handle, and find that 85.4% of the misclassified examples relate to neutral category. The positive instances are rarely misclassified as negative, and vice versa. A example of errors is: “freaky friday on television reminding me to think wtf happened to lindsay lohan, she was such a terrific actress , + my huge crush on haley hudson.”, which is incorrectly predicted as positive towards target “indsay lohan” in both TD-LSTM and TC-LSTM.
+
+卧槽，一开始读句子才发现要做的情感分类任务还是挺难的，一个句子中有多个情感对象，他这个句子可能目的就是为了表达某个情感评论，但是中间提到的某些东西可能是不带有情感色彩的，然后这些不带有情感色彩的东西要被作为target，说实话虽然人类能做对，这些题目还是挺反人类直觉的。分类错误这些东西我觉得真的算得上是情有可原，到底是不是中立态度本身就稍稍带有主观问题了，文中已经提到，几乎不会有正面和反面被分类错误的情况，这样看来，技术进步的程度相比于最初提出情感分类的时候已经是相当大的飞跃的，这里重新刷新了我对于情感分类的现有成果的认识。
+
+我实在是觉得这类问题真的说不上是分类错误，但是现在好像确实集中在处理这类问题。。。惊为天人。这篇论文本来还是准备尝试训练Attention的，但是没有取得高于普通LSTM的结果，推测的原因是语料库过小。之后的相关工作和前面Introduction部分基本上是完全一样的，又再说了一遍。Conclusion过于简洁，以至于不能很好的从简介中得知这篇论文具体讲了什么，我相当于要注意，写论文的摘要和总结，要充分的把自己完成了什么工作写清楚，即使字数稍微多一点，也比要花很多时间读完整篇文章中间的具体阐释才清楚这篇论文在讲什么要好。
+
+但都是确实太强了，MSRA就是那个独立出去制作小冰的部门。
+
+> We believe that incorporation lexicon information in TC-LSTM could get further improvement. We leave this as a potential future work.
+
+在谷歌学术上的搜索结果来看，bi-lstm几乎算是2016年才开始被广泛利用，2015年可能有了少量的使用（仅搜索到一篇），还几乎没有这种提法。
+
+> adaptive recursive neural network (Dong et al., 2014), whose composition functions are adaptively selected according to the inputs
 
 ## 小结（1-3）
 
-\# 写上面论文的小结，最好稍微理出来一个时间线（这需要从后往前读，现在先把下面的弄完再说）
-
-- [ ] 要开始做PPT了（3h）
-- [ ] 先读完这篇（1h），然后稍微读一下另外几篇的大致内容，略过实验部分（1h）
-- [ ] 把这篇报告写完整（1h）
+![timeline.drawio](znote.assets/timeline.drawio.png)
 
 ## 相关不熟悉术语
 
@@ -197,14 +226,3 @@ TD-LSTM基本可以看做就是稍稍改动的Bi-LSTM（或者就是，我现在
 ​	![n-fold cross validation_00](znote.assets/n-fold cross validation_00.png)
 
 固定模型结构和当前模型的训练过程（学习率，训练轮数，优化器），更改模型训练的数据集划分，获取最终情况下的训练结果
-
-> 也就是说，最好把训练模型的过程封装成config文件，对应于更新的训练过程（即训练策略作为一种固定的参数，这种参数在训练模型的过程中被记录，并作为此后模型训练的可选择参数，那么一开始可以有个default参数，然后在default基础上进行修改）
->
-> 这样确保了模型训练过程的统一性和稳定性，不同的训练过程可以认为是不同的模型。对，就是这一点，应当认为一个模型保存框架，包含了不同的**训练策略**和**模型结构**及其**参数**。
-
-> Todo: 封装通用的模型训练代码，yml还是json还是什么，之后要考虑。
-
-> 其实还要考虑的问题就是，这模型本身的参数都是可以调整的，要如何决定也是个问题。
-
-> 知识图谱，盲区，但是是个重要的东西，相当于模拟了我们人类知识学习的方式。
-

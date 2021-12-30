@@ -45,4 +45,4 @@
 ## 自己找的阅读材料
 
 - [x] [TextCNN with Attention for Text Classification](https://arxiv.org/ftp/arxiv/papers/2108/2108.01921.pdf)
-- [ ] 
+  - [ ] 
